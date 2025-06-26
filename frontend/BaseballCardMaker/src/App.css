@@ -5,19 +5,29 @@
   text-align: center;
 }
 
-.StatsBlock {
-  background: #fff;
-  border: 10px solid #999;
-  float: left;
-  font-size: 24px;
-  font-weight: normal;
-  line-height: 34px;
-  margin-right: -1px;
-  margin-top: -1px;
-  padding: 0;
-  text-align: center;
-  color: black;
-  height:90%;
-  width: 90%;
+.stats-table {
+  border-collapse: collapse;
+  width: 100%;
+  font-family: Arial, sans-serif;
+  border-color: white;
+  border: 1px solid;
 }
 
+.stats-table th, .stats-table td {
+  border: 1px solid #ddd;
+  padding: 8px;
+  text-align: center;
+}
+
+.stats-table th {
+  background-color: white;
+  color: black;
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+
+.loading{
+  width: 10%;
+  height: auto;
+}
