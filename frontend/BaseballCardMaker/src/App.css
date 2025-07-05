@@ -1,8 +1,57 @@
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  overflow: hidden;
+  font-family: Arial, sans-serif;
+}
+
 #root {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
-  text-align: center;
+  width: 100vw;
+  height: 100vh;
+  padding: 1rem; /* Global padding */
+  box-sizing: border-box;
+}
+
+.editor-ui-container {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  gap: 1rem; /* spacing between editor and UI */
+  box-sizing: border-box;
+}
+
+/* New wrapper to help with aspect-ratio alignment */
+.card-editor-wrapper {
+  width: 75%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  border: 3px solid white;
+}
+
+.card-editor {
+  aspect-ratio: 2.5 / 3.5;
+  height: 100%;
+  max-height: 100%;
+  max-width: 100%;
+  border: 3px solid white;
+  border-radius: 8px;
+  padding: 1rem;
+
+  box-sizing: border-box;
+  overflow: auto;
+}
+.UI {
+  border: 3px solid white;
+  border-radius: 8px;
+  padding: 1rem;
+  width: 25%;
+  height: 100%;
+  box-sizing: border-box;
+  overflow: auto;
 }
 
 .stats-table {
@@ -25,9 +74,4 @@
   position: sticky;
   top: 0;
   z-index: 1;
-}
-
-.loading{
-  width: 10%;
-  height: auto;
 }
