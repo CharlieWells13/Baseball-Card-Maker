@@ -9,41 +9,18 @@ html, body {
 #root {
   width: 100vw;
   height: 100vh;
-  padding: 1rem; /* Global padding */
+  padding: 1rem; 
   box-sizing: border-box;
 }
 
 .editor-ui-container {
   display: flex;
   width: 100%;
-  height: 100%;
-  gap: 1rem; /* spacing between editor and UI */
+  height: 100vh;
+  gap: 1rem;
   box-sizing: border-box;
 }
 
-/* New wrapper to help with aspect-ratio alignment */
-.card-editor-wrapper {
-  width: 75%;
-  height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-sizing: border-box;
-  border: 3px solid white;
-}
-
-.card-editor {
-  aspect-ratio: 2.5 / 3.5;
-  height: 100%;
-  max-height: 100%;
-  max-width: 100%;
-  border: 3px solid white;
-  border-radius: 8px;
-  padding: 1rem;
-
-  box-sizing: border-box;
-  overflow: auto;
-}
 .UI {
   border: 3px solid white;
   border-radius: 8px;
@@ -54,9 +31,34 @@ html, body {
   overflow: auto;
 }
 
+.card-editor-wrapper {
+  width: 75%;
+  height: 90%;
+  max-height: 90%;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  border: 3px solid white;
+}
+
+.card-editor {
+  aspect-ratio: 2.5 / 3.5;
+  max-height: 100%;
+  height: 100%;
+  width: auto;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  border: 3px solid white;
+  border-radius: 8px;
+  box-sizing: border-box;
+}
+
 .stats-table {
   border-collapse: collapse;
-  width: 100%;
+  max-width: 100%;
   font-family: Arial, sans-serif;
   border-color: white;
   border: 1px solid;
@@ -74,4 +76,53 @@ html, body {
   position: sticky;
   top: 0;
   z-index: 1;
+}
+
+.resize-handle {
+  height: 6px;
+  background: #ccc;
+  cursor: row-resize;
+}
+
+.card-editor > .panel-group {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.panel-group > .Panel {
+  flex: 1;
+  overflow: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.player-image-wrapper{
+  max-height: 100%;
+  max-width: 100%;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+}
+
+.player-image-wrapper h2,
+.player-image-wrapper input {
+  flex-shrink: 0;
+  margin-bottom: 0.5rem;
+}
+
+.player-image{
+  flex-grow: 1;
+  width: 100%;
+  object-fit: contain;
+  display: block;
+  max-width: 100%;
+  max-height: 100%;
+}
+
+.error-message {
+  color: red;
+  margin-top: 0.5rem;
+  font-weight: bold;
 }

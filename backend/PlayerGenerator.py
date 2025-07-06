@@ -10,7 +10,9 @@ class PlayerGenerator:
             return player
         except IndexError:
             print("Player not found.")
+            raise IndexError
         except Exception as e:
             print("Something went wrong:", e)
+            raise Exception
 
         

@@ -34,14 +34,16 @@ def handle_player_query():
 
         print(stats)
 
-
         return jsonify({
+            "playerFound": True,
             "playerQueried": f"{firstName} {lastName}",
             "stats": stats.to_dict(orient="records")
         }), 200
 
     except IndexError:
+        print("Index Error Detected, no player found")
         return jsonify({
+            "playerfound": False,
             "error": f"No player found for {firstName} {lastName}"
         }), 404
 

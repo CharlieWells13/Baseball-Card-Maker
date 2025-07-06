@@ -2,17 +2,11 @@ import { useState, useEffect} from 'react'
 import './App.css'
 import loadingGif from './assets/Loading.gif'
 
-import {
-  getPanelElement,
-  getPanelGroupElement,
-  getResizeHandleElement,
-  Panel,
-  PanelGroup,
-  PanelResizeHandle,
-} from "react-resizable-panels";
+import { Mosaic, MosaicWindow } from 'react-mosaic-component';
 
-
-
+import 'react-mosaic-component/react-mosaic-component.css';
+import '@blueprintjs/core/lib/css/blueprint.css';
+import '@blueprintjs/icons/lib/css/blueprint-icons.css';
 
 function QueryPlayer(firstName: string, lastName: string): Promise<any> {
   return fetch('/api/query-player', {
@@ -76,13 +70,21 @@ function PlayerImage() {
   }
 
   return (
-    <div className="PlayerImage">
+    <div className='player-image-wrapper'>
       <h2>Add Image:</h2>
       <input type="file" onChange={handleChange} />
-      {file && <img src={file} alt="Uploaded preview" />}
+      {file && <img src={file} alt="Uploaded preview" className='player-image'/>}
     </div>
   );
 }
+
+export type ViewId = 'a' | 'b' | 'c' | 'new';
+const TITLE_MAP: Record<ViewId, string> = {
+  a: 'Left Window',
+  b: 'Top Right Window',
+  c: 'Bottom Right Window',
+  new: 'New Window',
+};
 
 
 function App() {
@@ -90,6 +92,8 @@ function App() {
   const [lastName, setLastName] = useState('')
 
   const [isQuerying, setIsQuerying] = useState(false)
+
+  const[playerNotFoundError, setPlayerNotFoundError] = useState(false)
 
   const visibleColumns = ["Season", "Team", "Age", "G", "AB", "PA", "H", "1B", "2B", "3B", "HR", "R", "RBI", "BB"];
 
@@ -119,7 +123,15 @@ function App() {
               setIsQuerying(true)
               QueryPlayer(firstName, lastName).then(data => {
                 console.log(data)
-                setCurrentStats(data.stats || []);
+                
+                if(data.playerFound){
+                  setCurrentStats(data.stats || []);
+                  setPlayerNotFoundError(false)
+                }
+                else{
+                  setCurrentStats([])
+                }
+
                 setIsQuerying(false)
               });
             }}
@@ -129,16 +141,33 @@ function App() {
           
           </label>
           <img hidden={!isQuerying} src={loadingGif} sizes='100px' className='loading'></img>
-
+          
+          
+          <div className="error-message" hidden={!playerNotFoundError}>
+            Player not found. Please check the name and try again.
+          </div>
+        
         </div>
 
         <div className='card-editor-wrapper'>
           <div className='card-editor'> 
-            <h3>Player Stats:</h3>
-            <StatsBlock currentStats={currentStats} visibleColumns={visibleColumns} />
-            <PlayerImage/>
+            <Mosaic<ViewId>
+              renderTile={(id, path) => (
+                <MosaicWindow<ViewId> path={path} createNode={() => 'new'} title={TITLE_MAP[id]}>
+                  <h1>{TITLE_MAP[id]}</h1>
+                </MosaicWindow>
+              )}
+              initialValue={{
+                direction: 'row',
+                first: 'a',
+                second: {
+                  direction: 'column',
+                  first: 'b',
+                  second: 'c',
+                },
+              }}
+            />
           </div>
-
         </div>
       </div>
     </div>
