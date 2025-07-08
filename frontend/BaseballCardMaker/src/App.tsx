@@ -3,6 +3,7 @@ import './App.css'
 import loadingGif from './assets/Loading.gif'
 
 import { Mosaic, MosaicWindow } from 'react-mosaic-component';
+import type { MosaicNode } from 'react-mosaic-component';
 
 import 'react-mosaic-component/react-mosaic-component.css';
 import '@blueprintjs/core/lib/css/blueprint.css';
@@ -59,31 +60,12 @@ function StatsBlock({ currentStats, visibleColumns }: StatsBlockProps) {
   )
 }
 
-function PlayerImage() {
-  const [file, setFile] = useState<string | null>(null);
 
-  function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
-    if (e.target.files && e.target.files.length > 0) {
-      const objectUrl = URL.createObjectURL(e.target.files[0]);
-      setFile(objectUrl);
-    }
-  }
 
-  return (
-    <div className='player-image-wrapper'>
-      <h2>Add Image:</h2>
-      <input type="file" onChange={handleChange} />
-      {file && <img src={file} alt="Uploaded preview" className='player-image'/>}
-    </div>
-  );
-}
-
-export type ViewId = 'a' | 'b' | 'c' | 'new';
+export type ViewId = 'stats' | 'image';
 const TITLE_MAP: Record<ViewId, string> = {
-  a: 'Left Window',
-  b: 'Top Right Window',
-  c: 'Bottom Right Window',
-  new: 'New Window',
+  stats: 'Stats Block',
+  image: 'Player Image'
 };
 
 
@@ -92,59 +74,121 @@ function App() {
   const [lastName, setLastName] = useState('')
 
   const [isQuerying, setIsQuerying] = useState(false)
+  const [playerLoaded, setPlayerLoaded] = useState(false)
+
+  const [imageLoaded, setImageLoaded] = useState(false)
+  const [imageFile, setImageFile] = useState('')
 
   const[playerNotFoundError, setPlayerNotFoundError] = useState(false)
+
+  const [mosaicTree, setMosaicTree] = useState<MosaicNode<ViewId> | null>(null);
 
   const visibleColumns = ["Season", "Team", "Age", "G", "AB", "PA", "H", "1B", "2B", "3B", "HR", "R", "RBI", "BB"];
 
   const [currentStats, setCurrentStats] = useState<BatterStatsSeason[]>([]);
 
+
+  
+  const addStatsBlock = () => {
+    setMosaicTree(prev =>
+      prev
+        ? { direction: 'row', first: prev, second: 'stats' }
+        : 'stats'
+    );
+  };
+
+  const addPlayerImage = () => {
+    setMosaicTree(prev =>
+      prev
+        ? { direction: 'row', first: prev, second: 'image' }
+        : 'image'
+    );
+  };
+
   return(
     <div>
       <div className='editor-ui-container'>
         <div className='UI'>
-          <label>
-            Enter First And Last Name to Query:
-            <input 
-              value={firstName} 
-              onChange={(e) => setFirstName(e.target.value)}
-              name='firstName' 
-              placeholder='First Name'
-            />
-            <input 
-              value={lastName} 
-              onChange={(e) => setLastName(e.target.value)}
-              name='lastName' 
-              placeholder='Last Name'
-            />
-            <button
-            disabled={isQuerying}
-            onClick={() => {
-              setIsQuerying(true)
-              QueryPlayer(firstName, lastName).then(data => {
-                console.log(data)
-                
-                if(data.playerFound){
-                  setCurrentStats(data.stats || []);
-                  setPlayerNotFoundError(false)
-                }
-                else{
-                  setCurrentStats([])
-                }
+          <div className='ui-block'>
+            <h1>
+              Player Data
+            </h1>
+            <label>
+              Enter First And Last Name to Query:
+              <input 
+                value={firstName} 
+                onChange={(e) => setFirstName(e.target.value)}
+                name='firstName' 
+                placeholder='First Name'
+              />
+              <input 
+                value={lastName} 
+                onChange={(e) => setLastName(e.target.value)}
+                name='lastName' 
+                placeholder='Last Name'
+              />
+              <button
+              disabled={isQuerying}
+              onClick={() => {
+                setIsQuerying(true)
+                setPlayerNotFoundError(false)
+                QueryPlayer(firstName, lastName).then(data => {
+                  console.log(data)
+                  
+                  if(data.playerFound){
+                    setCurrentStats(data.stats || [])
+                    setPlayerNotFoundError(false)
+                    setPlayerLoaded(true)
+                  }
+                  else{
+                    setPlayerNotFoundError(true)
+                    setCurrentStats([])
+                    setPlayerLoaded(false)
+                  }
 
-                setIsQuerying(false)
-              });
-            }}
-            >
-          Query Player
-          </button>
+                  setIsQuerying(false)
+                });
+              }}
+              >
+            Query Player
+            </button>
+            
+            </label>
+            <img hidden={!isQuerying} src={loadingGif} sizes='100px' className='loading-image'></img>
+            
+            
+            <div className="error-message" hidden={!playerNotFoundError}>
+              Player not found. Please check the name and try again.
+            </div>
+
+            <div className='player-loaded-indicator' hidden={!playerLoaded}>
+              Curent Player Loaded: {firstName} {lastName}
+            </div>
+
+            <button className='add-stats-block' disabled={!playerLoaded} onClick={addStatsBlock}>
+              Add Stats Block
+            </button>
+          </div>
           
-          </label>
-          <img hidden={!isQuerying} src={loadingGif} sizes='100px' className='loading'></img>
-          
-          
-          <div className="error-message" hidden={!playerNotFoundError}>
-            Player not found. Please check the name and try again.
+          <div className='ui-block'>
+            <h1>
+              Player Image
+            </h1>
+            <input
+              type="file"
+              accept="image/*"
+              onChange={(e) => {
+                if (e.target.files && e.target.files.length > 0) {
+                  const objectUrl = URL.createObjectURL(e.target.files[0]);
+                  setImageFile(objectUrl);
+                  setImageLoaded(true);
+                }
+              }}
+            />
+
+            <button className='add-player-image' disabled={!imageLoaded} onClick={addPlayerImage}>
+              Add Player Image
+            </button>
           </div>
         
         </div>
@@ -152,23 +196,23 @@ function App() {
         <div className='card-editor-wrapper'>
           <div className='card-editor'> 
             <Mosaic<ViewId>
+              value={mosaicTree}
+              onChange={setMosaicTree}
               renderTile={(id, path) => (
-                <MosaicWindow<ViewId> path={path} createNode={() => 'new'} title={TITLE_MAP[id]}>
-                  <h1>{TITLE_MAP[id]}</h1>
+                <MosaicWindow<ViewId> path={path} 
+                  title={TITLE_MAP[id]}>
+                  {id === 'stats' && (
+                    <StatsBlock currentStats={currentStats} visibleColumns={visibleColumns} />
+                  )}
+                  {id === 'image' && (
+                    <img src={imageFile} alt="Uploaded Player" className='player-image' />
+                  )}
                 </MosaicWindow>
               )}
-              initialValue={{
-                direction: 'row',
-                first: 'a',
-                second: {
-                  direction: 'column',
-                  first: 'b',
-                  second: 'c',
-                },
-              }}
             />
           </div>
         </div>
+
       </div>
     </div>
 

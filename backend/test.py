@@ -7,5 +7,6 @@ if __name__ == "__main__":
     if player:
         print(player.getBattingStats())
         print(player.getPitchingStats())
+        print(player.getBasicInfo())
     else:
         print("Player generation failed.")

@@ -1,13 +1,15 @@
 import pybaseball as pybaseball
+from pybaseball.lahman import download_lahman,people
 import pandas as pd
 
 class Player:
-    def __init__(self, firstName, lastName, IDfg, firstYear, lastYear):
+    def __init__(self, firstName, lastName, IDfg, firstYear, lastYear, key_mlbam):
         self.firstName = firstName
         self.lastName = lastName
         self.IDfg = IDfg
         self.firstYear = firstYear
-        self.lastYear = lastYear   
+        self.lastYear = lastYear  
+        self.key_mlbam = key_mlbam
 
     def getBattingStats(self):
         try:
@@ -33,6 +35,12 @@ class Player:
             print(f"Failed to fetch pitching stats: {e}")
             return pd.DataFrame()
     
+    def getBasicInfo(self):
+        try:
+            return people.player_info(self.key_mlbam)
+        except Exception as e:
+            print(f"Failed to fetch basic info: {e}")
+
 
 
     
