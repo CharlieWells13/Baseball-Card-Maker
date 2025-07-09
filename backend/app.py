@@ -2,7 +2,7 @@ import Player
 import PlayerGenerator
 
 import pandas as pd
-from flask import Flask,jsonify,request
+from flask import Flask,jsonify,request, send_from_directory
 from flask_cors import CORS
 
 app = Flask(__name__)
@@ -49,6 +49,16 @@ def handle_player_query():
 
     
 
-if __name__ == '__main__':
-    app.run(debug=True, port=5555)
+@app.route('/cards/<path:filename>')
+def cards_static(filename):
+    return send_from_directory('static/cards', filename)
 
+@app.route('/cards/')
+@app.route('/cards')
+def cards_index():
+    return send_from_directory('static/cards', 'index.html')
+
+
+if __name__ == '__main__':
+    # Use default port 8000 for local testing, or 5555 if you prefer
+    app.run(debug=True, port=8000)
