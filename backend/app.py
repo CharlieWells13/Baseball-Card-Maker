@@ -1,5 +1,6 @@
 import Player
 import PlayerGenerator
+import os
 
 import pandas as pd
 from flask import Flask,jsonify,request, send_from_directory
@@ -60,5 +61,5 @@ def cards_index():
 
 
 if __name__ == '__main__':
-    # Use default port 8000 for local testing, or 5555 if you prefer
-    app.run(debug=True, port=8000)
+    port = int(os.environ.get('PORT', 8000))
+    app.run(debug=True, host='0.0.0.0', port=port)
